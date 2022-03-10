@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "text": "Realizar emissão da NF",
+        "day": "Todo dia 10 do mês",
+        "reminder": true
+    },
+    {
+        "id": 2,
+        "text": "Importação da NF",
+        "day": "Todo dia 20 do mês",
+        "reminder": true
+    }
+]
