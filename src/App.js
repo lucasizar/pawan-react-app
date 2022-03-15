@@ -1,39 +1,75 @@
 //PAREI NO MIN 1:03:40
 //https://www.youtube.com/watch?v=w7ejDZ8SWv8
 
-import { useState } from "react"
-import defaultTasks from './util/tasks.json'
+import { useState, useEffect } from "react"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import Header from './components/Header'
+import Footer from './components/Footer'
 import Tasks from './components/Tasks'
+import AddTask from './components/AddTask'
+import {
+  fetchTasks,
+  deleteTaskById,
+  includeTask,
+  fetchTask,
+  updateTask
+} from './services/taskService'
 
 const App = () => {
-  const [tasks, setTasks] = useState(defaultTasks)
+  const [showAddTask, setShowAddTask] = useState(false)
+  const [tasks, setTasks] = useState([])
+
+  useEffect(() => {
+    const getTasks = async () => {
+      const tasksFromServer = await fetchTasks()
+      setTasks(tasksFromServer)
+    }
+
+    getTasks()
+  }, [])
+
+
+  //Add Task
+  const addTask = async (task) => {
+    await includeTask({ ...task, id: tasks.length + 1 })
+
+    setTasks([
+      ...tasks,
+      { ...task, id: tasks.length + 1 }
+    ])
+    setShowAddTask(false)
+  }
 
   // Delete Task
-  const deleteTask = (id) => {
+  const deleteTask = async (id) => {
+    await deleteTaskById(id)
+
     setTasks(tasks.filter(task => task.id !== id))
   }
 
   // Toggle Reminder
-  const toggleReminder = (id) => {
-    setTasks(
-      tasks.map(task => {
-        if (task.id === id)
-          return { ...task, reminder: !task.reminder }
+  const toggleReminder = async (id) => {
+    const taskToToggle = await fetchTask(id)
 
-        return task
-      })
-    )
+    const updTask = { ...taskToToggle, reminder: !taskToToggle.reminder }
+
+    await updateTask(updTask)
+
+    const tasksFromServer = await fetchTasks()
+
+    setTasks(tasksFromServer)
   }
 
   return (
     <div className="container">
-      <Header />
+      <Header onAdd={() => setShowAddTask(!showAddTask)} showAdd={showAddTask} />
+      {showAddTask && <AddTask onAdd={addTask} />}
       {
         tasks.length > 0 ? <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} /> : 'No tasks to show'
       }
+      <Footer />
     </div>
   )
 }
 
-export default App;
+export default App
