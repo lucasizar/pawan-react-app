@@ -17,11 +17,15 @@ const deleteTaskById = async (id) => {
 }
 
 const includeTask = async (task) => {
-    await fetch(`http://localhost:3001/tasks`, {
+    const fetchResult = await fetch(`http://localhost:3001/tasks`, {
         method: 'POST' ,
         headers: { 'Content-type': 'application/json'},
         body: JSON.stringify(task)
     })
+
+    const taskResult = await fetchResult.json()
+
+    return taskResult
 }
 
 const updateTask = async (task) => {

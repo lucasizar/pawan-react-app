@@ -1,16 +1,17 @@
-//PAREI NO minuto 40h30
-//https://www.youtube.com/watch?v=w7ejDZ8SWv8
-
+import { useLocation } from 'react-router-dom'
 import Button from './Button'
 
 const Header = ({ title, onAdd, showAdd }) => {
+    const location = useLocation()
+
+
       return (
         <header className="header">
             <h1>{title}</h1>
-            <Button
-                text={showAdd ? 'Close' : 'Add'}
-                color={showAdd ? 'red' : 'green'}
-            onClick={onAdd} />
+            {location.pathname === '/' && (
+                <Button text={showAdd ? 'Close' : 'Add'} color={showAdd ? 'red' : 'green'} onClick={onAdd} />
+            )}
+
         </header> 
     )
 }

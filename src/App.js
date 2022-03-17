@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import Header from './components/Header'
 import Footer from './components/Footer'
+import About from './components/About'
 import Tasks from './components/Tasks'
 import AddTask from './components/AddTask'
 import {
@@ -31,12 +32,8 @@ const App = () => {
 
   //Add Task
   const addTask = async (task) => {
-    await includeTask({ ...task, id: tasks.length + 1 })
-
-    setTasks([
-      ...tasks,
-      { ...task, id: tasks.length + 1 }
-    ])
+    const taskResult = await includeTask({ ...task })
+    setTasks([...tasks, taskResult])
     setShowAddTask(false)
   }
 
@@ -61,14 +58,23 @@ const App = () => {
   }
 
   return (
-    <div className="container">
-      <Header onAdd={() => setShowAddTask(!showAddTask)} showAdd={showAddTask} />
-      {showAddTask && <AddTask onAdd={addTask} />}
-      {
-        tasks.length > 0 ? <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} /> : 'No tasks to show'
-      }
-      <Footer />
-    </div>
+    <Router>
+      <div className="container">
+        <Header onAdd={() => setShowAddTask(!showAddTask)} showAdd={showAddTask} />
+        <Routes>
+          <Route path="/" element={
+            <>
+             {showAddTask && <AddTask onAdd={addTask} />}
+              {
+                tasks.length > 0 ? <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} /> : 'No tasks to show'
+              }
+            </>
+          }/>
+          <Route path='/about' element={<About />} />
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
   )
 }
 
