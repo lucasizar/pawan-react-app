@@ -17,13 +17,16 @@ import {
 } from './services/taskService'
 
 const App = () => {
+  const [loading, setLoading] = useState(true)
   const [showAddTask, setShowAddTask] = useState(false)
   const [tasks, setTasks] = useState([])
 
   useEffect(() => {
     const getTasks = async () => {
+      setLoading(true)
       const tasksFromServer = await fetchTasks()
       setTasks(tasksFromServer)
+      setLoading(false)
     }
 
     getTasks()
@@ -32,20 +35,29 @@ const App = () => {
 
   //Add Task
   const addTask = async (task) => {
+    setLoading(true)
+
     const taskResult = await includeTask({ ...task })
+    console.log('taskResult', taskResult)
     setTasks([...tasks, taskResult])
     setShowAddTask(false)
+
+    setLoading(false)
   }
 
   // Delete Task
   const deleteTask = async (id) => {
+    setLoading(true)
     await deleteTaskById(id)
 
     setTasks(tasks.filter(task => task.id !== id))
+    setLoading(false)
   }
 
   // Toggle Reminder
   const toggleReminder = async (id) => {
+    setLoading(true)
+
     const taskToToggle = await fetchTask(id)
 
     const updTask = { ...taskToToggle, reminder: !taskToToggle.reminder }
@@ -55,24 +67,32 @@ const App = () => {
     const tasksFromServer = await fetchTasks()
 
     setTasks(tasksFromServer)
+
+    setLoading(false)
   }
 
   return (
     <Router>
       <div className="container">
-        <Header onAdd={() => setShowAddTask(!showAddTask)} showAdd={showAddTask} />
+        <Header onAdd={() => setShowAddTask(!showAddTask)} showAdd={showAddTask} loading={loading} />
         <Routes>
           <Route path="/" element={
             <>
-             {showAddTask && <AddTask onAdd={addTask} />}
-              {
-                tasks.length > 0 ? <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} /> : 'No tasks to show'
-              }
+              {!loading && <>
+                {showAddTask && <AddTask onAdd={addTask} />}
+                {
+                  tasks.length > 0 ? <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} /> : 'No tasks to show'
+                }
+              </>}
+
+              {loading && <>
+                <span>Loading...</span>
+              </>}
             </>
-          }/>
+          } />
           <Route path='/about' element={<About />} />
         </Routes>
-        <Footer />
+        <Footer loading={loading} />
       </div>
     </Router>
   )
