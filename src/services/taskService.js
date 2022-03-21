@@ -1,5 +1,7 @@
 const API_URL = process.env.REACT_APP_API_URL
 
+console.log('API_URL', API_URL)
+
 const fetchTasks = async () => {
     const res = await fetch(`${API_URL}/tasks`)
     const data = await res.json()
